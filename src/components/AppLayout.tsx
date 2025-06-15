@@ -1,5 +1,5 @@
 
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import {
   SidebarProvider,
   Sidebar,
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Home, LogOut, Tractor } from "lucide-react";
+import { Home, LogOut, LayoutDashboard, Table, Users, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
@@ -25,8 +25,106 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+const menuByRole = {
+  industry: [
+    {
+      title: "Dashboard",
+      to: "/dashboard/industry",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Lotes",
+      to: "/dashboard/lotes",
+      icon: Table,
+    },
+  ],
+  resale: [
+    {
+      title: "Dashboard",
+      to: "/dashboard/resale",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Vendas",
+      to: "/dashboard/vendas",
+      icon: Table,
+    },
+  ],
+  rt: [
+    {
+      title: "Dashboard",
+      to: "/dashboard/rt",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "ARTs",
+      to: "/dashboard/arts",
+      icon: Table,
+    },
+  ],
+  farmer: [
+    {
+      title: "Dashboard",
+      to: "/dashboard/farmer",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Minhas Propriedades",
+      to: "/dashboard/propriedades",
+      icon: Table,
+    },
+  ],
+  fiscal: [
+    {
+      title: "Dashboard",
+      to: "/dashboard/fiscal",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Auditorias",
+      to: "/dashboard/auditorias",
+      icon: ShieldCheck,
+    },
+  ],
+};
+
 const AppLayout = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const role = user?.role?.toLowerCase();
+
+  // Redireciona para o dashboard do perfil correto ao acessar /dashboard
+  if (location.pathname === "/dashboard" && role) {
+    switch (role) {
+      case "industry":
+        navigate("/dashboard/industry", { replace: true });
+        break;
+      case "resale":
+        navigate("/dashboard/resale", { replace: true });
+        break;
+      case "rt":
+        navigate("/dashboard/rt", { replace: true });
+        break;
+      case "farmer":
+        navigate("/dashboard/farmer", { replace: true });
+        break;
+      case "fiscal":
+        navigate("/dashboard/fiscal", { replace: true });
+        break;
+      default:
+        break;
+    }
+  }
+
+  const menu = menuByRole[role] || [
+    {
+      title: "Dashboard",
+      to: "/dashboard",
+      icon: Home,
+    },
+  ];
 
   return (
     <SidebarProvider>
@@ -34,7 +132,7 @@ const AppLayout = () => {
         <Sidebar>
           <SidebarHeader className="p-4">
             <Link to="/dashboard" className="flex items-center gap-2">
-              <Tractor className="h-6 w-6 text-primary" />
+              <LayoutDashboard className="h-6 w-6 text-primary" />
               <span className="font-bold text-lg">AgroRT</span>
             </Link>
           </SidebarHeader>
@@ -42,14 +140,16 @@ const AppLayout = () => {
             <SidebarGroup>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link to="/dashboard">
-                        <Home className="h-4 w-4" />
-                        <span>Dashboard</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+                  {menu.map((item) => (
+                    <SidebarMenuItem key={item.to}>
+                      <SidebarMenuButton asChild>
+                        <Link to={item.to}>
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
