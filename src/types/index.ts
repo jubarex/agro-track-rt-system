@@ -1,4 +1,3 @@
-
 import { z } from "zod";
 
 // Schema para validação do formulário de propriedade
@@ -25,6 +24,18 @@ export type Application = {
   responsible: string; // Responsável técnico
   culture: string;
 };
+
+// Schema para validação do formulário de ART
+export const artSchema = z.object({
+  id: z.string().optional(),
+  artNumber: z.string().min(1, "O número da ART é obrigatório."),
+  issueDate: z.string().min(1, "A data de emissão é obrigatória."),
+  propertyId: z.string().min(1, "A propriedade é obrigatória."),
+  applicationId: z.string().min(1, "A aplicação é obrigatória."),
+  fileUrl: z.string().optional(), // Para o PDF enviado
+});
+
+export type ART = z.infer<typeof artSchema>;
 
 // Dados mock
 export const MOCK_PROPERTIES: (Property & { applications: Application[] })[] = [

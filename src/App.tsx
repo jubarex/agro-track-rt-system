@@ -20,6 +20,7 @@ import { AuthProvider } from "./contexts/AuthProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./components/AppLayout";
 import PropriedadesPage from "./pages/PropriedadesPage";
+import ARTsPage from "./pages/ARTsPage";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
               <Route path="nfe" element={<NFePage />} />
               <Route path="rastreabilidade" element={<DashboardRastreabilidade />} />
               <Route path="propriedades" element={<PropriedadesPage />} />
+              <Route path="arts" element={<ARTsPage />} />
               {/* Outras rotas do dashboard podem ser adicionadas aqui */}
             </Route>
 
