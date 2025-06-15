@@ -1,4 +1,3 @@
-
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,18 +19,27 @@ import { Tractor } from 'lucide-react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { supabase } from "@/lib/supabase";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Nome completo deve ter pelo menos 2 caracteres." }),
-  role: z.enum(["industria", "revenda", "responsavel_tecnico", "produtor_rural", "fiscal"], {
+  role: z.enum(["industry", "resale", "rt", "farmer", "fiscal"], {
     errorMap: () => ({ message: "Por favor, selecione um tipo de conta." }),
   }),
   email: z.string().email({ message: "Por favor, insira um email válido." }),
   password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres." }),
+  creaNumber: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.role === 'rt' && (!data.creaNumber || data.creaNumber.trim().length === 0)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'O número do CREA é obrigatório para Responsável Técnico.',
+      path: ['creaNumber'],
+    });
+  }
 });
 
 const SignupPage = () => {
@@ -45,15 +53,61 @@ const SignupPage = () => {
       fullName: "",
       email: "",
       password: "",
+      creaNumber: "",
     },
   });
 
+  const role = form.watch('role');
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
+
+    if (values.role === 'rt') {
+      console.log(`Simulando validação do CREA no backend: ${values.creaNumber}`);
+      
+      // --- PONTO DE INTEGRAÇÃO COM O BACKEND ---
+      // Para uma implementação real, você chamaria sua Supabase Edge Function aqui para validar o CREA.
+      // Exemplo:
+      //
+      // const { data, error } = await supabase.functions.invoke('validate-crea', { 
+      //   body: { creaNumber: values.creaNumber } 
+      // });
+      // 
+      // if (error || !data.isValid) {
+      //   toast({ title: "CREA Inválido", description: "Não foi possível validar seu número do CREA.", variant: "destructive" });
+      //   form.setError("creaNumber", { type: "manual", message: "Número do CREA inválido." });
+      //   setLoading(false);
+      //   return;
+      // }
+      //
+      // toast({ title: "CREA Validado", description: "Seu número de CREA foi validado com sucesso!" });
+      // --- FIM DO PONTO DE INTEGRAÇÃO ---
+
+      // Simulação da validação para fins de UI
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const isCreaValid = Math.random() > 0.2; // 80% de chance de ser válido
+
+      if (!isCreaValid) {
+        toast({
+          title: "CREA Inválido (Simulado)",
+          description: "Não foi possível validar seu número do CREA. Verifique e tente novamente.",
+          variant: "destructive",
+        });
+        form.setError("creaNumber", { type: "manual", message: "Número do CREA inválido." });
+        setLoading(false);
+        return;
+      }
+      
+      toast({
+        title: "CREA Validado (Simulado)",
+        description: "Seu número de CREA foi validado com sucesso!",
+      });
+    }
+
     console.log("Signup form submitted (Supabase integration is paused):", values);
 
     // A chamada ao Supabase está temporariamente desabilitada.
-    // Para reativar, descomente o bloco a seguir e remova o código de simulação abaixo.
+    // Para reativar, você adicionaria os dados do CREA ao objeto `data` do usuário
     /*
     const { error } = await supabase.auth.signUp({
       email: values.email,
@@ -62,6 +116,7 @@ const SignupPage = () => {
         data: {
           full_name: values.fullName,
           role: values.role,
+          ...(values.role === 'rt' && { crea_number: values.creaNumber, crea_validated: true })
         },
       },
     });
@@ -137,10 +192,10 @@ const SignupPage = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="industria">Indústria</SelectItem>
-                        <SelectItem value="revenda">Revenda</SelectItem>
-                        <SelectItem value="responsavel_tecnico">Responsável Técnico</SelectItem>
-                        <SelectItem value="produtor_rural">Produtor Rural</SelectItem>
+                        <SelectItem value="industry">Indústria</SelectItem>
+                        <SelectItem value="resale">Revenda</SelectItem>
+                        <SelectItem value="rt">Responsável Técnico</SelectItem>
+                        <SelectItem value="farmer">Produtor Rural</SelectItem>
                         <SelectItem value="fiscal">Fiscal (CREA/MAPA)</SelectItem>
                       </SelectContent>
                     </Select>
@@ -148,6 +203,24 @@ const SignupPage = () => {
                   </FormItem>
                 )}
               />
+              {role === 'rt' && (
+                <FormField
+                  control={form.control}
+                  name="creaNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número do CREA</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: SP-12345678/D" {...field} value={field.value ?? ''} />
+                      </FormControl>
+                      <FormDescription>
+                          Será validado no momento do cadastro.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               <FormField
                 control={form.control}
                 name="email"

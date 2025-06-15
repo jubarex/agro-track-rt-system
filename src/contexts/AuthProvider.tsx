@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,6 +5,8 @@ interface User {
   email: string;
   fullName: string;
   role: string;
+  creaNumber?: string;
+  creaValidated?: boolean;
 }
 
 interface AuthContextType {

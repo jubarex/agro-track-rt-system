@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const DashboardPage = () => {
   const { user } = useAuth();
+  const role = user?.role?.toLowerCase();
 
   return (
     <div>
@@ -15,6 +16,14 @@ const DashboardPage = () => {
         <CardContent>
           <p><strong>Email:</strong> {user?.email}</p>
           <p><strong>Perfil:</strong> {user?.role}</p>
+          {role === 'rt' && user?.creaNumber && (
+            <p>
+              <strong>CREA:</strong> {user.creaNumber}{' '}
+              <span className={user.creaValidated ? "text-green-600" : "text-orange-500"}>
+                {user.creaValidated ? '(Validado)' : '(Pendente)'}
+              </span>
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
