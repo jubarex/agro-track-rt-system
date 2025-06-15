@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { User } from "@/types";
+import { AppUser } from "@/contexts/AuthProvider";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Por favor, insira um email válido." }),
@@ -38,7 +39,7 @@ const LoginPage = () => {
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simula latência de rede
 
       const usersJSON = localStorage.getItem('users_db');
-      const users: User[] = usersJSON ? JSON.parse(usersJSON) : [];
+      const users: AppUser[] = usersJSON ? JSON.parse(usersJSON) : [];
 
       const foundUser = users.find(u => u.email === values.email);
       // A checagem de senha é ignorada por ser uma simulação
@@ -54,6 +55,7 @@ const LoginPage = () => {
           role: foundUser.role,
           creaNumber: foundUser.creaNumber,
           creaValidated: foundUser.creaValidated,
+          rtType: foundUser.rtType,
         });
       } else {
         toast({

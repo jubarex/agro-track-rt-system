@@ -1,7 +1,12 @@
 
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User } from '@/types';
+import { User as BaseUser } from '@/types';
+
+// Extend the base User type to include RT specialization
+export type AppUser = BaseUser & {
+  rtType?: 'industria' | 'transporte' | 'receituario' | 'propriedade';
+};
 
 // This type represents the object coming from the login/signup forms.
 interface LoginUserData {
@@ -10,10 +15,11 @@ interface LoginUserData {
   role: string;
   creaNumber?: string;
   creaValidated?: boolean;
+  rtType?: AppUser['rtType'];
 }
 
 interface AuthContextType {
-  user: User | null;
+  user: AppUser | null;
   isAuthenticated: boolean;
   loading: boolean;
   login: (userData: LoginUserData) => void;
@@ -23,7 +29,7 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -36,17 +42,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = (userData: LoginUserData) => {
-    const appUser: User = {
+    const appUser: AppUser = {
       id: userData.email, // Using email as id, as it's unique.
       name: userData.fullName,
       email: userData.email,
-      role: userData.role as User['role'], // Assuming role from form matches allowed roles.
+      role: userData.role as BaseUser['role'], // Assuming role from form matches allowed roles.
       creaNumber: userData.creaNumber,
       creaValidated: userData.creaValidated,
+      rtType: userData.rtType,
     };
     localStorage.setItem('user', JSON.stringify(appUser));
     setUser(appUser);
-    navigate('/dashboard');
+    
+    // Redirect based on role
+    const rolePath = appUser.role === 'rt' ? 'rt' : appUser.role;
+    navigate(`/dashboard/${rolePath}`);
   };
 
   const logout = () => {

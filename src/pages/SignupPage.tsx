@@ -20,10 +20,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
-import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { User } from "@/types";
+import { AppUser } from "@/contexts/AuthProvider";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Nome completo deve ter pelo menos 2 caracteres." }),
@@ -33,12 +33,21 @@ const formSchema = z.object({
   email: z.string().email({ message: "Por favor, insira um email válido." }),
   password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres." }),
   creaNumber: z.string().optional(),
+  rtType: z.enum(["industria", "transporte", "receituario", "propriedade"]).optional(),
 }).superRefine((data, ctx) => {
   if (data.role === 'rt' && (!data.creaNumber || data.creaNumber.trim().length === 0)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: 'O número do CREA é obrigatório para Responsável Técnico.',
       path: ['creaNumber'],
+    });
+  }
+}).superRefine((data, ctx) => {
+  if (data.role === 'rt' && !data.rtType) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Por favor, selecione a especialidade do Responsável Técnico.',
+      path: ['rtType'],
     });
   }
 });
@@ -93,7 +102,7 @@ const SignupPage = () => {
     // Usando localStorage para simular um banco de dados de usuários
     try {
       const usersJSON = localStorage.getItem('users_db');
-      const users: User[] = usersJSON ? JSON.parse(usersJSON) : [];
+      const users: AppUser[] = usersJSON ? JSON.parse(usersJSON) : [];
 
       const existingUser = users.find(u => u.email === values.email);
       if (existingUser) {
@@ -106,13 +115,14 @@ const SignupPage = () => {
         return;
       }
 
-      const newUser: User = {
+      const newUser: AppUser = {
         id: values.email,
         name: values.fullName,
         email: values.email,
         role: values.role,
         creaNumber: values.creaNumber,
         creaValidated: values.role === 'rt' ? creaValidated : undefined,
+        rtType: values.rtType,
       };
 
       users.push(newUser);
@@ -192,22 +202,47 @@ const SignupPage = () => {
                 )}
               />
               {role === 'rt' && (
-                <FormField
-                  control={form.control}
-                  name="creaNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Número do CREA</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ex: SP-12345678/D" {...field} value={field.value ?? ''} />
-                      </FormControl>
-                      <FormDescription>
-                          Será validado no momento do cadastro.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <>
+                  <FormField
+                    control={form.control}
+                    name="creaNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Número do CREA</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: SP-12345678/D" {...field} value={field.value ?? ''} />
+                        </FormControl>
+                        <FormDescription>
+                            Será validado no momento do cadastro.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="rtType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Especialidade do RT</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione sua especialidade" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="industria">RT da Indústria</SelectItem>
+                            <SelectItem value="transporte">RT do Transporte</SelectItem>
+                            <SelectItem value="receituario">RT do Receituário Agronômico</SelectItem>
+                            <SelectItem value="propriedade">RT da Propriedade Rural</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
               )}
               <FormField
                 control={form.control}
