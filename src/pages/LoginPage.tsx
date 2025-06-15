@@ -1,5 +1,5 @@
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,9 +8,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Por favor, insira um email válido." }),
@@ -19,7 +19,7 @@ const formSchema = z.object({
 
 const LoginPage = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -32,32 +32,6 @@ const LoginPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
-    console.log("Login form submitted (Supabase integration is paused):", values);
-
-    // A chamada ao Supabase está temporariamente desabilitada.
-    // Para reativar, descomente o bloco a seguir e remova o código de simulação abaixo.
-    /*
-    const { error } = await supabase.auth.signInWithPassword({
-      email: values.email,
-      password: values.password,
-    });
-    setLoading(false);
-
-    if (error) {
-      toast({
-        title: "Erro no Login",
-        description: "Email ou senha inválidos. Por favor, tente novamente.",
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Login bem-sucedido!",
-        description: "Redirecionando...",
-      });
-      navigate("/");
-    }
-    */
-
     // Simulação de login bem-sucedido para desenvolvimento da UI
     setTimeout(() => {
       setLoading(false);
@@ -65,7 +39,12 @@ const LoginPage = () => {
         title: "Login (Simulado) bem-sucedido!",
         description: "Redirecionando para a página principal...",
       });
-      navigate("/");
+      // A role será definida dinamicamente quando o Supabase for integrado
+      login({ 
+        email: values.email,
+        fullName: 'Usuário de Teste', 
+        role: 'Produtor Rural' 
+      });
     }, 1000);
   };
 
