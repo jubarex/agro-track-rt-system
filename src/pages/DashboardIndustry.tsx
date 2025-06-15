@@ -182,6 +182,7 @@ const DashboardIndustry = () => {
                 <TableHead>Insumo</TableHead>
                 <TableHead>Data Fabricação</TableHead>
                 <TableHead>Data Validade</TableHead>
+                <TableHead>Localização Atual</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -192,6 +193,7 @@ const DashboardIndustry = () => {
                   <TableCell>{lote.insumo}</TableCell>
                   <TableCell>{new Date(lote.dataFabricacao).toLocaleDateString()}</TableCell>
                   <TableCell>{new Date(lote.dataValidade).toLocaleDateString()}</TableCell>
+                  <TableCell>{lote.movimentacoes[0]?.local || "N/A"}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="outline" size="sm" onClick={() => setViewingLot(lote)}>
                       <Eye className="mr-2 h-4 w-4" /> Ver Histórico
