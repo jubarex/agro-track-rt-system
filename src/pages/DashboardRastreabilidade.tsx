@@ -5,75 +5,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-
-type Movimentacao = {
-  data: string;
-  evento: string;
-  local: string;
-  tipo: "Recebimento" | "Transporte" | "Venda" | "Processamento";
-  responsavel: string;
-  observacao?: string;
-};
-
-const MOCK_DATA = [
-  {
-    codigoLote: "LOTE-20240615-001",
-    insumo: "Herbicida XZ100",
-    fabricante: "Química Verde S.A.",
-    dataFabricacao: "2024-05-10",
-    dataValidade: "2026-05-10",
-    movimentacoes: [
-      {
-        data: "2024-05-12",
-        evento: "Recebido na Indústria",
-        local: "Química Verde S.A.",
-        tipo: "Recebimento",
-        responsavel: "Funcionário: Maria Souza",
-        observacao: "Lote inspecionado e aprovado.",
-      },
-      {
-        data: "2024-05-16",
-        evento: "Transporte para Revenda AgroMax",
-        local: "AgroMax",
-        tipo: "Transporte",
-        responsavel: "Motorista: Pedro Dias",
-        observacao: "Transportado sob temperatura controlada.",
-      },
-      {
-        data: "2024-06-02",
-        evento: "Venda para Produtor João Silva",
-        local: "Fazenda Santa Luzia",
-        tipo: "Venda",
-        responsavel: "Representante: Ana Paula",
-        observacao: "Entrega realizada com sucesso.",
-      },
-    ] as Movimentacao[],
-  },
-  {
-    codigoLote: "LOTE-20240614-002",
-    insumo: "Fungicida ZYX90",
-    fabricante: "AgroLab S/A",
-    dataFabricacao: "2024-04-28",
-    dataValidade: "2026-04-28",
-    movimentacoes: [
-      {
-        data: "2024-05-05",
-        evento: "Recebido na Indústria",
-        local: "AgroLab S/A",
-        tipo: "Recebimento",
-        responsavel: "Funcionário: Lucas Moraes",
-        observacao: "Sem não conformidades.",
-      },
-      {
-        data: "2024-05-08",
-        evento: "Transporte para Revenda RuralMais",
-        local: "RuralMais",
-        tipo: "Transporte",
-        responsavel: "Motorista: Fábio Gomes",
-      },
-    ] as Movimentacao[],
-  },
-];
+import { Lote, Movimentacao, MOCK_LOTES } from "@/types";
 
 function exportMovimentacoesToCSV(movimentacoes: Movimentacao[], arquivo: string) {
   const headers = ["Data", "Evento", "Local", "Tipo", "Responsável", "Observação"];
@@ -92,7 +24,7 @@ function exportMovimentacoesToCSV(movimentacoes: Movimentacao[], arquivo: string
 
 const DashboardRastreabilidade = () => {
   const [search, setSearch] = useState("");
-  const [lotes] = useState(MOCK_DATA);
+  const [lotes] = useState<Lote[]>(MOCK_LOTES);
 
   // Busca pelo código do lote
   const lote = lotes.find(l =>
@@ -139,8 +71,8 @@ const DashboardRastreabilidade = () => {
               <p><strong>Código do lote:</strong> {lote.codigoLote}</p>
               <p><strong>Insumo:</strong> {lote.insumo}</p>
               <p><strong>Fabricante:</strong> {lote.fabricante}</p>
-              <p><strong>Data de fabricação:</strong> {lote.dataFabricacao}</p>
-              <p><strong>Validade:</strong> {lote.dataValidade}</p>
+              <p><strong>Data de fabricação:</strong> {new Date(lote.dataFabricacao).toLocaleDateString()}</p>
+              <p><strong>Validade:</strong> {new Date(lote.dataValidade).toLocaleDateString()}</p>
             </CardContent>
           </Card>
 
@@ -154,8 +86,9 @@ const DashboardRastreabilidade = () => {
           </Card>
         </>
       ) : (
-        <div className="text-muted-foreground mt-8">
-          Nenhum lote encontrado para o filtro informado.
+        <div className="text-muted-foreground mt-8 text-center py-10">
+          <p>Digite um código de lote para ver sua rastreabilidade.</p>
+          <p className="text-sm">Ex: LOTE-HVZ-2405-001</p>
         </div>
       )}
     </div>

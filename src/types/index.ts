@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 
 // Schema para validação do formulário de propriedade
@@ -155,6 +156,8 @@ export const MOCK_ARTS: FullART[] = [
     propertyId: "prop-1",
     applicationId: "app-1",
     fileUrl: "/mock-art.pdf", // Link para o PDF
+    lotNumber: "LOTE-HVZ-2405-001",
+    nfNumber: "987654",
     // Dados denormalizados
     propertyName: prop1?.name || 'N/A',
     applicationProduct: app1?.product || 'N/A',
@@ -177,5 +180,103 @@ export const MOCK_ARTS: FullART[] = [
     responsible: app3?.responsible || 'N/A',
     culture: app3?.culture || 'N/A',
     dose: app3?.dose || 'N/A',
+  }
+];
+
+// Movimentação de Lote
+export type Movimentacao = {
+  data: string;
+  evento: string;
+  local: string;
+  tipo: "Fabricação" | "Transporte" | "Venda" | "Aplicação" | "Recebimento" | "Processamento";
+  responsavel: string;
+  observacao?: string;
+};
+
+// Schema para Lote de Insumo
+export const loteSchema = z.object({
+  id: z.string().optional(),
+  codigoLote: z.string(),
+  insumo: z.string().min(1, "O nome do insumo é obrigatório."),
+  fabricante: z.string().min(1, "O nome do fabricante é obrigatório."),
+  composition: z.string().min(1, "A composição é obrigatória."),
+  dataFabricacao: z.string().refine((val) => val && !isNaN(Date.parse(val)), {
+    message: "A data de fabricação é obrigatória.",
+  }),
+  dataValidade: z.string().refine((val) => val && !isNaN(Date.parse(val)), {
+    message: "A data de validade é obrigatória.",
+  }),
+});
+
+export type Lote = z.infer<typeof loteSchema> & { movimentacoes: Movimentacao[] };
+
+// Dados mock para Lotes
+export const MOCK_LOTES: Lote[] = [
+    {
+    id: "lote-1",
+    codigoLote: "LOTE-HVZ-2405-001",
+    insumo: "Herbicida Z-MAX",
+    fabricante: "AgroQuímica S.A.",
+    composition: "Glifosato 50%",
+    dataFabricacao: "2024-05-10",
+    dataValidade: "2026-05-10",
+    movimentacoes: [
+      {
+        data: "2024-05-10",
+        evento: "Lote produzido",
+        local: "AgroQuímica S.A. - Unidade Campinas",
+        tipo: "Fabricação",
+        responsavel: "Carlos Andrade",
+      },
+      {
+        data: "2024-05-15",
+        evento: "Transporte para Revenda AgroFuturo",
+        local: "Revenda AgroFuturo - Unidade Cuiabá",
+        tipo: "Transporte",
+        responsavel: "LogiFácil Transportes",
+        observacao: "Carga segurada",
+      },
+      {
+        data: "2024-06-12",
+        evento: "Venda para Produtor via ART 2024123456",
+        local: "Revenda AgroFuturo",
+        tipo: "Venda",
+        responsavel: "Ana Costa",
+        observacao: "NF-e: 987654",
+      },
+      {
+        data: MOCK_PROPERTIES.find(p => p.id === 'prop-1')?.applications.find(a => a.id === 'app-1')?.date || 'N/A',
+        evento: "Aplicação via Receituário",
+        local: `Propriedade: ${MOCK_PROPERTIES.find(p => p.id === 'prop-1')?.name}`,
+        tipo: "Aplicação",
+        responsavel: `RT: ${MOCK_PROPERTIES.find(p => p.id === 'prop-1')?.applications.find(a => a.id === 'app-1')?.responsible}`,
+        observacao: "Cultura: Soja",
+      }
+    ],
+  },
+  {
+    id: "lote-2",
+    codigoLote: "LOTE-FGX-2404-002",
+    insumo: "Fungicida Protetor",
+    fabricante: "AgroQuímica S.A.",
+    composition: "Mancozeb 80%",
+    dataFabricacao: "2024-04-20",
+    dataValidade: "2026-04-20",
+    movimentacoes: [
+        {
+            data: "2024-04-20",
+            evento: "Lote produzido",
+            local: "AgroQuímica S.A. - Unidade Anápolis",
+            tipo: "Fabricação",
+            responsavel: "Beatriz Lima",
+        },
+        {
+            data: "2024-04-25",
+            evento: "Transporte para Revenda Campo Forte",
+            local: "Revenda Campo Forte - Unidade Rondonópolis",
+            tipo: "Transporte",
+            responsavel: "LogiFácil Transportes",
+        }
+    ]
   }
 ];
