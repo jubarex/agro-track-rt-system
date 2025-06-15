@@ -1,10 +1,11 @@
-
 import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableHeader, TableRow, TableHead, TableCell, TableBody } from "@/components/ui/table";
 import Timeline from "@/components/Timeline";
-import { Lote, FullART, MOCK_LOTES, MOCK_ARTS } from "@/types";
+import DataCrossAnalysis from "@/components/DataCrossAnalysis";
+import ApplicationsMap from "@/components/ApplicationsMap";
+import { Lote, FullART, MOCK_LOTES, MOCK_ARTS, MOCK_PROPERTIES, Property, Application, Car } from "@/types";
 import { Search, FileText } from "lucide-react";
 
 const DashboardFiscal = () => {
@@ -13,6 +14,7 @@ const DashboardFiscal = () => {
 
   const [lotes] = useState<Lote[]>(MOCK_LOTES);
   const [arts] = useState<FullART[]>(MOCK_ARTS);
+  const [properties] = useState<(Property & { applications: Application[]; car?: Car | undefined; })[]>(MOCK_PROPERTIES);
 
   const foundLote = loteSearch.trim()
     ? lotes.find((l) =>
@@ -146,19 +148,19 @@ const DashboardFiscal = () => {
         </CardContent>
       </Card>
 
-      {/* US013 & US014 Placeholder */}
+      {/* US013: Cruzamento de Dados */}
+      <DataCrossAnalysis arts={arts} properties={properties} lotes={lotes} />
+      
+      {/* US014: Mapa de Aplicações */}
       <Card>
          <CardHeader>
-          <CardTitle>Análises Avançadas (Em Breve)</CardTitle>
+          <CardTitle>Mapa Interativo de Aplicações por Região (US014)</CardTitle>
           <CardDescription>
-            Funcionalidades de cruzamento de dados e mapas de aplicação serão disponibilizadas futuramente.
+            Visualize as propriedades com aplicações de insumos registradas no mapa.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="list-disc list-inside text-muted-foreground space-y-1 text-sm">
-            <li><b>US013:</b> Cruzamento Automático de Dados (CAR x NF x Receituário).</li>
-            <li><b>US014:</b> Mapa Interativo de Aplicações por Região.</li>
-          </ul>
+          <ApplicationsMap properties={properties} />
         </CardContent>
       </Card>
     </div>
