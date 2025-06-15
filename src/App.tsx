@@ -21,6 +21,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./components/AppLayout";
 import PropriedadesPage from "./pages/PropriedadesPage";
 import ARTsPage from "./pages/ARTsPage";
+import RTProfilePage from "./pages/RTProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => (
               <Route path="propriedades" element={<PropriedadesPage />} />
               <Route path="propriedades/:propertyId" element={<PropriedadesPage />} />
               <Route path="arts" element={<ARTsPage />} />
+              <Route path="rt/:rtId" element={<RTProfilePage />} />
               {/* Outras rotas do dashboard podem ser adicionadas aqui */}
             </Route>
 

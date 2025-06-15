@@ -1,4 +1,6 @@
+
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableHeader, TableRow, TableHead, TableCell, TableBody } from "@/components/ui/table";
@@ -121,7 +123,11 @@ const DashboardFiscal = () => {
                   foundArts.map((art) => (
                     <TableRow key={art.id}>
                       <TableCell className="font-medium">{art.artNumber}</TableCell>
-                      <TableCell>{art.responsible}</TableCell>
+                      <TableCell>
+                        <Link to={`/dashboard/rt/${encodeURIComponent(art.responsible)}`} className="font-medium text-primary hover:underline">
+                          {art.responsible}
+                        </Link>
+                      </TableCell>
                       <TableCell>{art.applicationProduct}</TableCell>
                       <TableCell>{art.propertyName}</TableCell>
                       <TableCell>{new Date(art.issueDate).toLocaleDateString()}</TableCell>

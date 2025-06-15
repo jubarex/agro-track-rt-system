@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +7,7 @@ import PropertySheet from "@/components/PropertySheet";
 import { Download, MapPin, Tractor, Wheat, BookCheck, FileText, UserCheck, Eye } from "lucide-react";
 import PropertyMap from "@/components/PropertyMap";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 
 type FullProperty = Property & { applications: Application[], car?: Car };
 
@@ -67,7 +66,11 @@ const ApplicationHistory = ({ applications }: { applications: Application[] }) =
               <TableCell>{app.date}</TableCell>
               <TableCell>{app.product}</TableCell>
               <TableCell>{app.dose}</TableCell>
-              <TableCell>{app.responsible}</TableCell>
+              <TableCell>
+                <Link to={`/dashboard/rt/${encodeURIComponent(app.responsible)}`} className="font-medium text-primary hover:underline">
+                  {app.responsible}
+                </Link>
+              </TableCell>
             </TableRow>
           )) : (
             <TableRow>
@@ -179,7 +182,9 @@ const ArtAndPrescriptionHistory = ({ property }: { property: FullProperty }) => 
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <UserCheck className="w-4 h-4 text-muted-foreground" />
-                    {art.responsible}
+                    <Link to={`/dashboard/rt/${encodeURIComponent(art.responsible)}`} className="font-medium text-primary hover:underline">
+                      {art.responsible}
+                    </Link>
                   </div>
                 </TableCell>
                 <TableCell>{art.applicationProduct}</TableCell>
