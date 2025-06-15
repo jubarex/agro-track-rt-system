@@ -7,6 +7,7 @@ import { Application, MOCK_PROPERTIES, Property } from "@/types";
 import PropertySheet from "@/components/PropertySheet";
 import { Download, MapPin, Tractor, Wheat } from "lucide-react";
 import PropertyMap from "@/components/PropertyMap";
+import { useAuth } from "@/hooks/useAuth";
 
 type FullProperty = Property & { applications: Application[] };
 
@@ -79,6 +80,8 @@ const ApplicationHistory = ({ applications }: { applications: Application[] }) =
 );
 
 const PropriedadesPage = () => {
+  const { user } = useAuth();
+  const role = user?.role?.toLowerCase();
   const [properties, setProperties] = useState<FullProperty[]>(MOCK_PROPERTIES);
   const [selectedProperty, setSelectedProperty] = useState<FullProperty | null>(properties[0] || null);
 
@@ -88,12 +91,17 @@ const PropriedadesPage = () => {
     setSelectedProperty(newProperty);
   };
 
+  const title = role === 'farmer' ? "Minhas Propriedades" : "Propriedades";
+  const description = role === 'farmer'
+    ? "Gerencie suas propriedades rurais e acompanhe o histórico."
+    : "Gerencie as propriedades rurais sob sua responsabilidade e acompanhe o histórico.";
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <h1 className="text-2xl font-bold">Minhas Propriedades</h1>
-            <p className="text-muted-foreground">Gerencie suas propriedades rurais e acompanhe o histórico.</p>
+            <h1 className="text-2xl font-bold">{title}</h1>
+            <p className="text-muted-foreground">{description}</p>
         </div>
         <PropertySheet onSave={handleSaveProperty} />
       </div>

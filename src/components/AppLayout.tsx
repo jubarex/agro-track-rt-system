@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Home, LogOut, LayoutDashboard, Table, Users, ShieldCheck, UploadCloud, Activity } from "lucide-react";
+import { Home, LogOut, LayoutDashboard, Table, Users, ShieldCheck, UploadCloud, Activity, FileText } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
@@ -78,9 +78,14 @@ const menuByRole = {
       icon: LayoutDashboard,
     },
     {
+      title: "Propriedades",
+      to: "/dashboard/propriedades",
+      icon: Table,
+    },
+    {
       title: "ARTs",
       to: "/dashboard/arts",
-      icon: Table,
+      icon: FileText,
     },
   ],
   farmer: [
