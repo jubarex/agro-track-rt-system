@@ -1,7 +1,10 @@
+
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { User } from '@/types';
 
-interface User {
+// This type represents the object coming from the login/signup forms.
+interface LoginUserData {
   email: string;
   fullName: string;
   role: string;
@@ -13,7 +16,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
-  login: (userData: User) => void;
+  login: (userData: LoginUserData) => void;
   logout: () => void;
 }
 
@@ -32,9 +35,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   }, []);
 
-  const login = (userData: User) => {
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
+  const login = (userData: LoginUserData) => {
+    const appUser: User = {
+      id: userData.email, // Using email as id, as it's unique.
+      name: userData.fullName,
+      email: userData.email,
+      role: userData.role as User['role'], // Assuming role from form matches allowed roles.
+      creaNumber: userData.creaNumber,
+      creaValidated: userData.creaValidated,
+    };
+    localStorage.setItem('user', JSON.stringify(appUser));
+    setUser(appUser);
     navigate('/dashboard');
   };
 

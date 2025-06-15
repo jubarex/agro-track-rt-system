@@ -8,7 +8,7 @@ const DashboardPage = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-4">Bem-vindo ao seu Dashboard, {user?.fullName}!</h1>
+      <h1 className="text-3xl font-bold mb-4">Bem-vindo ao seu Dashboard, {user?.name}!</h1>
       <Card>
         <CardHeader>
           <CardTitle>Suas Informações</CardTitle>

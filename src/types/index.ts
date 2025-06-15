@@ -5,8 +5,10 @@ import { z } from "zod";
 export type User = {
   id: string;
   name: string;
-  email?: string;
+  email: string;
   role: "industry" | "resale" | "rt" | "farmer" | "fiscal" | "admin";
+  creaNumber?: string;
+  creaValidated?: boolean;
 };
 
 // Adicionando o tipo NFeData para ser compartilhado
