@@ -1,12 +1,58 @@
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tractor } from 'lucide-react';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+
+const formSchema = z.object({
+  email: z.string().email({ message: "Por favor, insira um email válido." }),
+  password: z.string().min(1, { message: "Senha é obrigatória." }),
+});
 
 const LoginPage = () => {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: values.email,
+      password: values.password,
+    });
+    setLoading(false);
+
+    if (error) {
+      toast({
+        title: "Erro no Login",
+        description: "Email ou senha inválidos. Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Login bem-sucedido!",
+        description: "Redirecionando...",
+      });
+      navigate("/");
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-secondary/30">
       <Card className="mx-auto max-w-sm w-full">
@@ -23,29 +69,44 @@ const LoginPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="nome@exemplo.com"
-                required
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="nome@exemplo.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Senha</Label>
-                <Link to="#" className="ml-auto inline-block text-sm underline">
-                  Esqueceu sua senha?
-                </Link>
-              </div>
-              <Input id="password" type="password" required />
-            </div>
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
-          </div>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center">
+                      <FormLabel>Senha</FormLabel>
+                      <Link to="#" className="ml-auto inline-block text-sm underline">
+                        Esqueceu sua senha?
+                      </Link>
+                    </div>
+                    <FormControl>
+                      <Input type="password" required {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Entrando..." : "Login"}
+              </Button>
+            </form>
+          </Form>
           <div className="mt-4 text-center text-sm">
             Não tem uma conta?{" "}
             <Link to="/signup" className="underline">
