@@ -50,6 +50,11 @@ const SignupPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
+    console.log("Signup form submitted (Supabase integration is paused):", values);
+
+    // A chamada ao Supabase está temporariamente desabilitada.
+    // Para reativar, descomente o bloco a seguir e remova o código de simulação abaixo.
+    /*
     const { error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
@@ -75,6 +80,17 @@ const SignupPage = () => {
       });
       navigate("/login");
     }
+    */
+
+    // Simulação de cadastro bem-sucedido para desenvolvimento da UI
+    setTimeout(() => {
+      setLoading(false);
+      toast({
+        title: "Cadastro (Simulado) bem-sucedido!",
+        description: "Redirecionando para a página de login...",
+      });
+      navigate("/login");
+    }, 1000);
   };
 
   return (
