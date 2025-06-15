@@ -40,6 +40,7 @@ const ApplicationsMap = ({ properties }: ApplicationsMapProps) => {
             <p class="text-sm">${property.address}</p>
             <p class="text-sm mt-1"><strong>Cultura:</strong> ${property.mainCulture}</p>
             <p class="text-sm"><strong>Aplicações:</strong> ${property.applications.length}</p>
+            <a href="/dashboard/propriedades/${property.id}" class="text-primary underline mt-2 block text-sm font-medium">Acessar propriedade</a>
           </div>
         `;
         

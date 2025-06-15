@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -7,6 +8,7 @@ import PropertySheet from "@/components/PropertySheet";
 import { Download, MapPin, Tractor, Wheat, BookCheck, FileText, UserCheck, Eye } from "lucide-react";
 import PropertyMap from "@/components/PropertyMap";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate, useParams } from "react-router-dom";
 
 type FullProperty = Property & { applications: Application[], car?: Car };
 
@@ -212,12 +214,30 @@ const PropriedadesPage = () => {
   const { user } = useAuth();
   const role = user?.role?.toLowerCase();
   const [properties, setProperties] = useState<FullProperty[]>(MOCK_PROPERTIES);
-  const [selectedProperty, setSelectedProperty] = useState<FullProperty | null>(properties[0] || null);
+  const { propertyId } = useParams();
+  const navigate = useNavigate();
+  const [selectedProperty, setSelectedProperty] = useState<FullProperty | null>(null);
+
+  useEffect(() => {
+    let propertyToSelect: FullProperty | null = null;
+    if (propertyId) {
+      propertyToSelect = properties.find(p => p.id === propertyId) || null;
+    } else if (properties.length > 0) {
+      propertyToSelect = properties[0];
+    }
+    setSelectedProperty(propertyToSelect);
+  }, [propertyId, properties]);
 
   const handleSaveProperty = (property: Property) => {
     const newProperty: FullProperty = { ...property, applications: [] };
     setProperties(prev => [...prev, newProperty]);
     setSelectedProperty(newProperty);
+    navigate(`/dashboard/propriedades/${newProperty.id}`);
+  };
+
+  const handleSelectProperty = (property: FullProperty) => {
+    setSelectedProperty(property);
+    navigate(`/dashboard/propriedades/${property.id}`);
   };
 
   const title = role === 'farmer' ? "Minhas Propriedades" : "Propriedades";
@@ -242,7 +262,7 @@ const PropriedadesPage = () => {
                 <Card 
                     key={prop.id} 
                     className={`cursor-pointer transition-all ${selectedProperty?.id === prop.id ? 'border-primary ring-2 ring-primary' : 'hover:border-primary/50'}`}
-                    onClick={() => setSelectedProperty(prop)}
+                    onClick={() => handleSelectProperty(prop)}
                 >
                     <CardHeader>
                         <CardTitle>{prop.name}</CardTitle>

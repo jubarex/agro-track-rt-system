@@ -55,6 +55,7 @@ const App = () => (
               <Route path="nfe" element={<NFePage />} />
               <Route path="rastreabilidade" element={<DashboardRastreabilidade />} />
               <Route path="propriedades" element={<PropriedadesPage />} />
+              <Route path="propriedades/:propertyId" element={<PropriedadesPage />} />
               <Route path="arts" element={<ARTsPage />} />
               {/* Outras rotas do dashboard podem ser adicionadas aqui */}
             </Route>
