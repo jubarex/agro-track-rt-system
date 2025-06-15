@@ -1,15 +1,14 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Application, MOCK_PROPERTIES, Property } from "@/types";
+import { Application, MOCK_PROPERTIES, Property, Car } from "@/types";
 import PropertySheet from "@/components/PropertySheet";
-import { Download, MapPin, Tractor, Wheat } from "lucide-react";
+import { Download, MapPin, Tractor, Wheat, BookCheck } from "lucide-react";
 import PropertyMap from "@/components/PropertyMap";
 import { useAuth } from "@/hooks/useAuth";
 
-type FullProperty = Property & { applications: Application[] };
+type FullProperty = Property & { applications: Application[], car?: Car };
 
 const PropertyReports = ({ property }: { property: FullProperty }) => {
   const exportToCSV = () => {
@@ -41,7 +40,7 @@ const PropertyReports = ({ property }: { property: FullProperty }) => {
         </CardContent>
     </Card>
   )
-}
+};
 
 
 const ApplicationHistory = ({ applications }: { applications: Application[] }) => (
@@ -78,6 +77,72 @@ const ApplicationHistory = ({ applications }: { applications: Application[] }) =
     </CardContent>
   </Card>
 );
+
+const CarDetails = ({ car }: { car?: Car }) => {
+    if (!car) {
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <BookCheck className="w-5 h-5 text-primary"/>
+                        Cadastro Ambiental Rural (CAR)
+                    </CardTitle>
+                    <CardDescription>
+                        Esta propriedade não possui um Cadastro Ambiental Rural (CAR) vinculado.
+                    </CardDescription>
+                </CardHeader>
+            </Card>
+        )
+    }
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <BookCheck className="w-5 h-5 text-primary"/>
+                    Cadastro Ambiental Rural (CAR)
+                </CardTitle>
+                <CardDescription>
+                    Código do Imóvel: <span className="font-mono bg-muted p-1 rounded-md">{car.idImovel}</span>
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                <div className="flex flex-col">
+                    <span className="text-muted-foreground">Status</span>
+                    <span className="font-semibold">{car.status}</span>
+                </div>
+                 <div className="flex flex-col">
+                    <span className="text-muted-foreground">Condição</span>
+                    <span className="font-semibold">{car.condicao ?? 'Não informado'}</span>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-muted-foreground">Tipo de Imóvel</span>
+                    <span className="font-semibold">{car.tipo}</span>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-muted-foreground">Área (CAR)</span>
+                    <span className="font-semibold">{car.area ? `${car.area} ha` : 'Não informado'}</span>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-muted-foreground">Módulos Fiscais</span>
+                    <span className="font-semibold">{car.modulosFiscais ?? 'Não informado'}</span>
+                </div>
+                 <div className="flex flex-col">
+                    <span className="text-muted-foreground">Município/UF</span>
+                    <span className="font-semibold">{car.idMunicipio} / {car.siglaUf}</span>
+                </div>
+                 <div className="flex flex-col">
+                    <span className="text-muted-foreground">Data de Extração</span>
+                    <span className="font-semibold">{car.dataExtracao ?? 'Não informado'}</span>
+                </div>
+                 <div className="flex flex-col">
+                    <span className="text-muted-foreground">Última Atualização</span>
+                    <span className="font-semibold">{car.dataAtualizacaoCar ?? 'Não informado'}</span>
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
 
 const PropriedadesPage = () => {
   const { user } = useAuth();
@@ -148,6 +213,7 @@ const PropriedadesPage = () => {
                   />
                 </CardContent>
               </Card>
+              <CarDetails car={selectedProperty.car} />
               <ApplicationHistory applications={selectedProperty.applications} />
               <PropertyReports property={selectedProperty} />
             </>

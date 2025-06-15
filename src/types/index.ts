@@ -14,6 +14,22 @@ export const propertySchema = z.object({
 
 export type Property = z.infer<typeof propertySchema>;
 
+// Schema e tipo para o Cadastro Ambiental Rural (CAR)
+export const carSchema = z.object({
+  idImovel: z.string(), // Código de inscrição no CAR
+  tipo: z.string(),
+  status: z.string(),
+  siglaUf: z.string(),
+  idMunicipio: z.string(),
+  dataExtracao: z.string().optional(),
+  dataAtualizacaoCar: z.string().optional(),
+  condicao: z.string().optional(),
+  modulosFiscais: z.coerce.number().optional(),
+  area: z.coerce.number().optional(),
+});
+
+export type Car = z.infer<typeof carSchema>;
+
 // Tipo para aplicação de insumos
 export type Application = {
   id: string;
@@ -47,7 +63,7 @@ export const artSchema = z.object({
 export type ART = z.infer<typeof artSchema>;
 
 // Dados mock
-export const MOCK_PROPERTIES: (Property & { applications: Application[] })[] = [
+export const MOCK_PROPERTIES: (Property & { applications: Application[], car?: Car })[] = [
   {
     id: "prop-1",
     name: "Fazenda Santa Luzia",
@@ -77,6 +93,18 @@ export const MOCK_PROPERTIES: (Property & { applications: Application[] })[] = [
         culture: "Soja",
       },
     ],
+    car: {
+        idImovel: "SP-3515807-ABCDE1234567890FABCDE1234567890F",
+        tipo: "Imóvel Rural",
+        status: "Ativo",
+        condicao: "Aguardando análise",
+        siglaUf: "SP",
+        idMunicipio: "3515807",
+        modulosFiscais: 15,
+        area: 150, // hectare
+        dataExtracao: "2025-02-20",
+        dataAtualizacaoCar: "2025-02-21",
+    }
   },
   {
     id: "prop-2",
