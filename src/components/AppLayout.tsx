@@ -94,6 +94,11 @@ const menuByRole = {
       to: "/dashboard/propriedades",
       icon: Table,
     },
+    {
+      title: "Rastreabilidade",
+      to: "/dashboard/rastreabilidade",
+      icon: Activity,
+    },
   ],
   fiscal: [
     {
