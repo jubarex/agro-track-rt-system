@@ -1,4 +1,3 @@
-
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import {
   SidebarProvider,
@@ -14,7 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Home, LogOut, LayoutDashboard, Table, Users, ShieldCheck } from "lucide-react";
+import { Home, LogOut, LayoutDashboard, Table, Users, ShieldCheck, UploadCloud } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
@@ -37,6 +36,11 @@ const menuByRole = {
       to: "/dashboard/lotes",
       icon: Table,
     },
+    {
+      title: "Notas Fiscais",
+      to: "/dashboard/nfe",
+      icon: UploadCloud,
+    },
   ],
   resale: [
     {
@@ -48,6 +52,11 @@ const menuByRole = {
       title: "Vendas",
       to: "/dashboard/vendas",
       icon: Table,
+    },
+    {
+      title: "Notas Fiscais",
+      to: "/dashboard/nfe",
+      icon: UploadCloud,
     },
   ],
   rt: [

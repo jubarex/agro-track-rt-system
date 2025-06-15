@@ -13,6 +13,7 @@ import DashboardResale from "./pages/DashboardResale";
 import DashboardRT from "./pages/DashboardRT";
 import DashboardFarmer from "./pages/DashboardFarmer";
 import DashboardFiscal from "./pages/DashboardFiscal";
+import NFePage from "./pages/NFePage";
 import { AuthProvider } from "./contexts/AuthProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./components/AppLayout";
@@ -44,6 +45,9 @@ const App = () => (
               <Route path="rt" element={<DashboardRT />} />
               <Route path="farmer" element={<DashboardFarmer />} />
               <Route path="fiscal" element={<DashboardFiscal />} />
+
+              {/* Novas rotas da fase 3 */}
+              <Route path="nfe" element={<NFePage />} />
               {/* Outras rotas do dashboard podem ser adicionadas aqui */}
             </Route>
 
