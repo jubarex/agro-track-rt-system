@@ -1,19 +1,24 @@
 
 import { Button } from "@/components/ui/button";
 import { Tractor, Users, Factory, Store, UserCheck, ShieldCheck } from 'lucide-react';
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
       <header className="px-4 lg:px-6 h-14 flex items-center border-b">
-        <a href="#" className="flex items-center justify-center">
+        <Link to="/" className="flex items-center justify-center">
           <Tractor className="h-6 w-6 text-primary" />
           <span className="ml-2 text-xl font-bold text-foreground">AgroRT</span>
-        </a>
+        </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Button variant="ghost">Login</Button>
-          <Button>Cadastre-se</Button>
+          <Button variant="ghost" asChild>
+            <Link to="/login">Login</Link>
+          </Button>
+          <Button asChild>
+            <Link to="/signup">Cadastre-se</Link>
+          </Button>
         </nav>
       </header>
 
