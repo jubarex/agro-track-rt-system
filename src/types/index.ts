@@ -59,6 +59,8 @@ export const artSchema = z.object({
   propertyId: z.string().min(1, "A propriedade é obrigatória."),
   applicationId: z.string().min(1, "A aplicação é obrigatória."),
   fileUrl: z.string().optional(), // Para o PDF enviado
+  lotNumber: z.string().optional(), // Número do lote do produto vendido
+  nfNumber: z.string().optional(),  // Número da Nota Fiscal da venda
 });
 
 export type ART = z.infer<typeof artSchema>;

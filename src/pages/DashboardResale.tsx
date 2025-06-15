@@ -3,12 +3,17 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { FullART, MOCK_ARTS } from "@/types";
-import { Search, CheckCircle, XCircle, FileText, User, Building, Package, Calendar, Beaker, Wheat } from "lucide-react";
+import { Search, CheckCircle, XCircle, FileText, User, Building, Package, Calendar, Beaker, Wheat, ClipboardCheck } from "lucide-react";
+import { toast } from "sonner";
 
 const DashboardResale = () => {
+  const [artsData, setArtsData] = useState<FullART[]>(MOCK_ARTS);
   const [artNumber, setArtNumber] = useState("");
   const [validatedArt, setValidatedArt] = useState<FullART | null | undefined>(undefined); // undefined: initial, null: not found
+  const [lotNumber, setLotNumber] = useState("");
+  const [nfNumber, setNfNumber] = useState("");
 
   const handleValidate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,8 +21,36 @@ const DashboardResale = () => {
       setValidatedArt(undefined);
       return;
     }
-    const foundArt = MOCK_ARTS.find(art => art.artNumber === artNumber.trim());
+    const foundArt = artsData.find(art => art.artNumber === artNumber.trim());
     setValidatedArt(foundArt || null);
+    setLotNumber("");
+    setNfNumber("");
+  };
+
+  const handleRegisterSale = () => {
+    if (!validatedArt || !lotNumber.trim() || !nfNumber.trim()) {
+      toast.error("Erro ao registrar", {
+        description: "Por favor, preencha o número do lote e da NF-e.",
+      });
+      return;
+    }
+
+    const updatedArts = artsData.map(art => {
+      if (art.id === validatedArt.id) {
+        return { ...art, lotNumber: lotNumber.trim(), nfNumber: nfNumber.trim() };
+      }
+      return art;
+    });
+
+    setArtsData(updatedArts);
+    setValidatedArt(prevArt => prevArt ? { ...prevArt, lotNumber: lotNumber.trim(), nfNumber: nfNumber.trim() } : null);
+
+    toast.success("Venda registrada com sucesso!", {
+      description: `A venda para a ART ${validatedArt.artNumber} foi vinculada.`,
+    });
+
+    setLotNumber("");
+    setNfNumber("");
   };
 
   return (
@@ -66,7 +99,7 @@ const DashboardResale = () => {
             <div className="flex-grow">
                 <CardTitle className="text-primary">ART Válida!</CardTitle>
                 <CardDescription>
-                    Receituário verificado com sucesso. Prossiga com a venda.
+                    Receituário verificado com sucesso. Prossiga com o registro da venda.
                 </CardDescription>
             </div>
           </CardHeader>
@@ -128,6 +161,57 @@ const DashboardResale = () => {
                   <p className="font-semibold">{new Date(validatedArt.applicationDate).toLocaleDateString()}</p>
                 </div>
               </div>
+            </div>
+
+            {/* Seção de Registro de Venda */}
+            <div className="mt-6 pt-6 border-t">
+              {validatedArt.lotNumber && validatedArt.nfNumber ? (
+                  <div className="p-4 rounded-md bg-secondary">
+                      <div className="flex items-center gap-3">
+                          <ClipboardCheck className="h-6 w-6 text-primary flex-shrink-0" />
+                          <div>
+                              <p className="font-semibold text-primary">Venda Registrada</p>
+                              <p className="text-sm text-muted-foreground">
+                                  Lote: <span className="font-medium text-foreground">{validatedArt.lotNumber}</span>
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                  NF-e: <span className="font-medium text-foreground">{validatedArt.nfNumber}</span>
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+              ) : (
+                  <div>
+                      <h4 className="text-lg font-semibold mb-2">Registrar Venda e Lote</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                          Vincule a venda ao lote do produto e à Nota Fiscal.
+                      </p>
+                      <div className="space-y-4">
+                           <div className="space-y-2">
+                               <Label htmlFor="lotNumber">Número do Lote</Label>
+                               <Input 
+                                  id="lotNumber" 
+                                  placeholder="Ex: LOTE2025-XYZ" 
+                                  value={lotNumber}
+                                  onChange={(e) => setLotNumber(e.target.value)}
+                               />
+                           </div>
+                           <div className="space-y-2">
+                               <Label htmlFor="nfNumber">Número da NF-e</Label>
+                               <Input 
+                                  id="nfNumber" 
+                                  placeholder="Ex: 987654" 
+                                  value={nfNumber}
+                                  onChange={(e) => setNfNumber(e.target.value)}
+                               />
+                           </div>
+                           <Button onClick={handleRegisterSale} className="w-full sm:w-auto">
+                              <ClipboardCheck className="mr-2 h-4 w-4" />
+                              Registrar Venda
+                           </Button>
+                      </div>
+                  </div>
+              )}
             </div>
           </CardContent>
         </Card>
