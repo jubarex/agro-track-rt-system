@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Home, LogOut, LayoutDashboard, Table, Users, ShieldCheck, UploadCloud } from "lucide-react";
+import { Home, LogOut, LayoutDashboard, Table, Users, ShieldCheck, UploadCloud, Timeline } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
@@ -41,6 +41,11 @@ const menuByRole = {
       to: "/dashboard/nfe",
       icon: UploadCloud,
     },
+    {
+      title: "Rastreabilidade",
+      to: "/dashboard/rastreabilidade",
+      icon: Timeline,
+    },
   ],
   resale: [
     {
@@ -57,6 +62,11 @@ const menuByRole = {
       title: "Notas Fiscais",
       to: "/dashboard/nfe",
       icon: UploadCloud,
+    },
+    {
+      title: "Rastreabilidade",
+      to: "/dashboard/rastreabilidade",
+      icon: Timeline,
     },
   ],
   rt: [
