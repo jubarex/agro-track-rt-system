@@ -1,5 +1,14 @@
-
 import { z } from "zod";
+
+// Adicionando o tipo NFeData para ser compartilhado
+export type NFeData = {
+  numero: string;
+  dataEmissao: string;
+  emitente: string;
+  destinatario: string;
+  valorTotal: string;
+  fileName: string; // Adicionado para identificar o arquivo
+};
 
 // Schema para validação do formulário de propriedade
 export const propertySchema = z.object({
@@ -11,6 +20,7 @@ export const propertySchema = z.object({
   longitude: z.coerce.number(),
   mainCulture: z.string().min(2, "A cultura principal é obrigatória."),
   address: z.string().min(5, "O endereço é obrigatório."),
+  state: z.string().length(2, "O estado deve ser a sigla com 2 caracteres.").optional(), // Adicionado para US017
 });
 
 export type Property = z.infer<typeof propertySchema>;
@@ -75,7 +85,8 @@ export const MOCK_PROPERTIES: (Property & { applications: Application[], car?: C
     latitude: -23.55052,
     longitude: -46.633308,
     mainCulture: "Soja",
-    address: "Zona Rural, n° 100, Cidade Exemplo, UF",
+    address: "Zona Rural, n° 100, Cidade Exemplo, SP",
+    state: "SP",
     applications: [
       {
         id: "app-1",
@@ -117,7 +128,8 @@ export const MOCK_PROPERTIES: (Property & { applications: Application[], car?: C
     latitude: -22.906847,
     longitude: -43.172896,
     mainCulture: "Milho",
-    address: "Estrada Vicinal, km 5, Outra Cidade, UF",
+    address: "Estrada Vicinal, km 5, Outra Cidade, RJ",
+    state: "RJ",
     applications: [
       {
         id: "app-3",
@@ -279,4 +291,20 @@ export const MOCK_LOTES: Lote[] = [
         }
     ]
   }
+];
+
+// Adicionando tipos e mocks para US016
+export type RegisteredRT = {
+  id: string;
+  name: string;
+  crea: string;
+  state: "SP" | "RJ" | "MG" | "GO";
+};
+
+export const MOCK_REGISTERED_RTS: RegisteredRT[] = [
+  { id: "rt-1", name: "João da Silva", crea: "CREA-SP 123456", state: "SP" },
+  { id: "rt-2", name: "Maria Oliveira", crea: "CREA-RJ 654321", state: "RJ" },
+  { id: "rt-3", name: "Carlos Pereira", crea: "CREA-SP 789012", state: "SP" },
+  { id: "rt-4", name: "Ana Souza", crea: "CREA-MG 345678", state: "MG" },
+  { id: "rt-5", name: "Pedro Martins", crea: "CREA-GO 901234", state: "GO" },
 ];

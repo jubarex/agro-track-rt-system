@@ -1,19 +1,11 @@
 
 import React, { useRef, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { UploadCloud } from "lucide-react";
+import { NFeData } from "@/types";
+import { toast } from "sonner";
 
-type NFeData = {
-  numero: string;
-  dataEmissao: string;
-  emitente: string;
-  destinatario: string;
-  valorTotal: string;
-};
-
-const parseNFeXML = (xmlString: string): NFeData | null => {
+const parseNFeXML = (xmlString: string): Omit<NFeData, "fileName"> | null => {
   try {
     const parser = new DOMParser();
     const xml = parser.parseFromString(xmlString, "text/xml");
@@ -22,21 +14,31 @@ const parseNFeXML = (xmlString: string): NFeData | null => {
     const dest = xml.querySelector("dest");
     const total = xml.querySelector("ICMSTot");
 
+    const nfeError = xml.querySelector("parsererror");
+    if (nfeError) {
+      console.error("XML Parsing Error:", nfeError.textContent);
+      return null;
+    }
+
     return {
       numero: ide?.querySelector("nNF")?.textContent || "",
-      dataEmissao: ide?.querySelector("dhEmi")?.textContent?.slice(0, 10) || "",
+      dataEmissao: ide?.querySelector("dhEmi")?.textContent || "",
       emitente: emit?.querySelector("xNome")?.textContent || "",
       destinatario: dest?.querySelector("xNome")?.textContent || "",
       valorTotal: total?.querySelector("vNF")?.textContent || "",
     };
-  } catch {
+  } catch (e) {
+    console.error("Error parsing XML", e);
     return null;
   }
 };
 
-const NFeUpload: React.FC = () => {
+type NFeUploadProps = {
+  onNFeParsed: (data: NFeData) => void;
+};
+
+const NFeUpload: React.FC<NFeUploadProps> = ({ onNFeParsed }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [nfeData, setNfeData] = useState<NFeData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,72 +49,46 @@ const NFeUpload: React.FC = () => {
     const reader = new FileReader();
     reader.onload = (evt) => {
       const xmlContent = evt.target?.result as string;
-      const data = parseNFeXML(xmlContent);
-      if (data) {
-        setNfeData(data);
-        setError(null);
+      const parsedData = parseNFeXML(xmlContent);
+      if (parsedData && parsedData.numero) {
+        onNFeParsed({ ...parsedData, fileName: file.name });
+        toast.success(`Arquivo "${file.name}" lido com sucesso!`);
+        if (inputRef.current) {
+          inputRef.current.value = ""; // Reset input para permitir upload do mesmo arquivo
+        }
       } else {
-        setError("Não foi possível ler o arquivo XML da NF-e.");
-        setNfeData(null);
+        setError("Não foi possível ler o arquivo XML da NF-e. Verifique o formato.");
+        toast.error("Falha ao ler o arquivo XML da NF-e.");
       }
     };
-    reader.onerror = () => setError("Erro ao ler o arquivo.");
-    reader.readAsText(file);
+    reader.onerror = () => {
+        setError("Erro ao ler o arquivo.");
+        toast.error("Ocorreu um erro ao ler o arquivo.");
+    }
+    reader.readAsText(file, 'UTF-8');
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Upload de NF-e (XML)</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-4">
-          <input
+    <div className="flex flex-col gap-4">
+        <input
             ref={inputRef}
             type="file"
             accept=".xml"
             className="hidden"
             onChange={handleFileChange}
             data-testid="input-nfe-upload"
-          />
-          <Button
+        />
+        <Button
             onClick={() => inputRef.current?.click()}
             variant="outline"
             className="flex gap-2 w-fit"
-          >
+        >
             <UploadCloud className="w-4 h-4" />
             Carregar NF-e XML
-          </Button>
+        </Button>
 
-          {error && <span className="text-destructive text-sm">{error}</span>}
-
-          {nfeData && (
-            <div className="w-full mt-2">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Número</TableHead>
-                    <TableHead>Data Emissão</TableHead>
-                    <TableHead>Emitente</TableHead>
-                    <TableHead>Destinatário</TableHead>
-                    <TableHead>Valor Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>{nfeData.numero}</TableCell>
-                    <TableCell>{nfeData.dataEmissao}</TableCell>
-                    <TableCell>{nfeData.emitente}</TableCell>
-                    <TableCell>{nfeData.destinatario}</TableCell>
-                    <TableCell>R$ {nfeData.valorTotal}</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        {error && <span className="text-destructive text-sm">{error}</span>}
+    </div>
   );
 };
 

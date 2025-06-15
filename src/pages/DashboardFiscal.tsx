@@ -7,8 +7,10 @@ import { Table, TableHeader, TableRow, TableHead, TableCell, TableBody } from "@
 import Timeline from "@/components/Timeline";
 import DataCrossAnalysis from "@/components/DataCrossAnalysis";
 import ApplicationsMap from "@/components/ApplicationsMap";
-import { Lote, FullART, MOCK_LOTES, MOCK_ARTS, MOCK_PROPERTIES, Property, Application, Car } from "@/types";
+import { Lote, FullART, MOCK_LOTES, MOCK_ARTS, MOCK_PROPERTIES, Property, Application, Car, MOCK_REGISTERED_RTS, RegisteredRT } from "@/types";
 import { Search, FileText } from "lucide-react";
+import AgrochemicalUsageReport from "@/components/AgrochemicalUsageReport";
+import ActiveProfessionalsReport from "@/components/ActiveProfessionalsReport";
 
 const DashboardFiscal = () => {
   const [loteSearch, setLoteSearch] = useState("");
@@ -17,6 +19,7 @@ const DashboardFiscal = () => {
   const [lotes] = useState<Lote[]>(MOCK_LOTES);
   const [arts] = useState<FullART[]>(MOCK_ARTS);
   const [properties] = useState<(Property & { applications: Application[]; car?: Car | undefined; })[]>(MOCK_PROPERTIES);
+  const [registeredRTs] = useState<RegisteredRT[]>(MOCK_REGISTERED_RTS);
 
   const foundLote = loteSearch.trim()
     ? lotes.find((l) =>
@@ -34,9 +37,13 @@ const DashboardFiscal = () => {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Painel de Fiscalização</h1>
       <p className="text-muted-foreground">
-        Ferramentas para auditoria e conformidade de insumos agrícolas.
+        Ferramentas para auditoria, conformidade e geração de insights para políticas públicas.
       </p>
 
+      {/* US017 & US016: Relatórios para Admin */}
+      <AgrochemicalUsageReport arts={arts} properties={properties} />
+      <ActiveProfessionalsReport arts={arts} registeredRTs={registeredRTs} />
+      
       {/* US011: Rastreabilidade de Lote */}
       <Card>
         <CardHeader>
