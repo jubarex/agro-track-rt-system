@@ -1,0 +1,148 @@
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Application, MOCK_PROPERTIES, Property } from "@/types";
+import PropertySheet from "@/components/PropertySheet";
+import { Download, MapPin, Tractor, Wheat } from "lucide-react";
+
+type FullProperty = Property & { applications: Application[] };
+
+const PropertyReports = ({ property }: { property: FullProperty }) => {
+  const exportToCSV = () => {
+    const headers = ["Data", "Produto", "Dose", "Método", "Responsável", "Cultura"];
+    const rows = property.applications.map(app =>
+      [app.date, app.product, app.dose, app.method, app.responsible, app.culture].join(",")
+    );
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `relatorio_aplicacoes_${property.name.replace(/\s+/g, '_')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <Card>
+        <CardHeader>
+            <CardTitle>Relatórios da Propriedade</CardTitle>
+            <CardDescription>Exporte os dados de aplicação de insumos.</CardDescription>
+        </CardHeader>
+        <CardContent>
+             <Button onClick={exportToCSV}>
+                <Download className="w-4 h-4 mr-2" />
+                Exportar Histórico (CSV)
+            </Button>
+        </CardContent>
+    </Card>
+  )
+}
+
+
+const ApplicationHistory = ({ applications }: { applications: Application[] }) => (
+  <Card>
+    <CardHeader>
+      <CardTitle>Histórico de Aplicações de Insumos</CardTitle>
+      <CardDescription>Veja todas as aplicações realizadas na propriedade.</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Data</TableHead>
+            <TableHead>Produto</TableHead>
+            <TableHead>Dose</TableHead>
+            <TableHead>Responsável</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {applications.length > 0 ? applications.map((app) => (
+            <TableRow key={app.id}>
+              <TableCell>{app.date}</TableCell>
+              <TableCell>{app.product}</TableCell>
+              <TableCell>{app.dose}</TableCell>
+              <TableCell>{app.responsible}</TableCell>
+            </TableRow>
+          )) : (
+            <TableRow>
+              <TableCell colSpan={4} className="text-center">Nenhuma aplicação registrada.</TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </CardContent>
+  </Card>
+);
+
+const PropriedadesPage = () => {
+  const [properties, setProperties] = useState<FullProperty[]>(MOCK_PROPERTIES);
+  const [selectedProperty, setSelectedProperty] = useState<FullProperty | null>(properties[0] || null);
+
+  const handleSaveProperty = (property: Property) => {
+    const newProperty: FullProperty = { ...property, applications: [] };
+    setProperties(prev => [...prev, newProperty]);
+    setSelectedProperty(newProperty);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 className="text-2xl font-bold">Minhas Propriedades</h1>
+            <p className="text-muted-foreground">Gerencie suas propriedades rurais e acompanhe o histórico.</p>
+        </div>
+        <PropertySheet onSave={handleSaveProperty} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1 space-y-4">
+            <h2 className="font-semibold">Lista de Propriedades</h2>
+            {properties.map(prop => (
+                <Card 
+                    key={prop.id} 
+                    className={`cursor-pointer transition-all ${selectedProperty?.id === prop.id ? 'border-primary ring-2 ring-primary' : 'hover:border-primary/50'}`}
+                    onClick={() => setSelectedProperty(prop)}
+                >
+                    <CardHeader>
+                        <CardTitle>{prop.name}</CardTitle>
+                        <CardDescription>{prop.address}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="flex items-center gap-2"><Tractor className="w-4 h-4 text-muted-foreground"/> {prop.totalArea} ha</div>
+                        <div className="flex items-center gap-2"><Wheat className="w-4 h-4 text-muted-foreground"/> {prop.mainCulture}</div>
+                    </CardContent>
+                </Card>
+            ))}
+             {properties.length === 0 && (
+                <div className="text-center text-muted-foreground border-2 border-dashed rounded-lg p-8">
+                    <p>Nenhuma propriedade cadastrada.</p>
+                    <p className="text-sm">Clique em "Adicionar Propriedade" para começar.</p>
+                </div>
+            )}
+        </div>
+
+        <div className="lg:col-span-2 space-y-6">
+          {selectedProperty ? (
+            <>
+              <ApplicationHistory applications={selectedProperty.applications} />
+              <PropertyReports property={selectedProperty} />
+            </>
+          ) : (
+            <div className="flex items-center justify-center h-full border-2 border-dashed rounded-lg">
+                <div className="text-center text-muted-foreground p-8">
+                    <MapPin className="w-12 h-12 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold">Nenhuma propriedade selecionada</h3>
+                    <p>Selecione uma propriedade na lista para ver os detalhes.</p>
+                </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PropriedadesPage;

@@ -1,0 +1,82 @@
+
+import { z } from "zod";
+
+// Schema para validação do formulário de propriedade
+export const propertySchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
+  ownerCpfCnpj: z.string().min(11, "CPF/CNPJ inválido."),
+  totalArea: z.coerce.number().positive("A área deve ser um número positivo."),
+  latitude: z.coerce.number(),
+  longitude: z.coerce.number(),
+  mainCulture: z.string().min(2, "A cultura principal é obrigatória."),
+  address: z.string().min(5, "O endereço é obrigatório."),
+});
+
+export type Property = z.infer<typeof propertySchema>;
+
+// Tipo para aplicação de insumos
+export type Application = {
+  id: string;
+  date: string;
+  product: string;
+  dose: string;
+  method: string;
+  responsible: string; // Responsável técnico
+  culture: string;
+};
+
+// Dados mock
+export const MOCK_PROPERTIES: (Property & { applications: Application[] })[] = [
+  {
+    id: "prop-1",
+    name: "Fazenda Santa Luzia",
+    ownerCpfCnpj: "123.456.789-00",
+    totalArea: 150,
+    latitude: -23.55052,
+    longitude: -46.633308,
+    mainCulture: "Soja",
+    address: "Zona Rural, n° 100, Cidade Exemplo, UF",
+    applications: [
+      {
+        id: "app-1",
+        date: "2024-06-10",
+        product: "Herbicida Z-MAX",
+        dose: "2L/ha",
+        method: "Pulverização tratorizada",
+        responsible: "João da Silva (CREA-SP 123456)",
+        culture: "Soja",
+      },
+      {
+        id: "app-2",
+        date: "2024-05-20",
+        product: "Fungicida Protetor",
+        dose: "1.5L/ha",
+        method: "Pulverização aérea",
+        responsible: "João da Silva (CREA-SP 123456)",
+        culture: "Soja",
+      },
+    ],
+  },
+  {
+    id: "prop-2",
+    name: "Sítio Água Limpa",
+    ownerCpfCnpj: "987.654.321-99",
+    totalArea: 75,
+    latitude: -22.906847,
+    longitude: -43.172896,
+    mainCulture: "Milho",
+    address: "Estrada Vicinal, km 5, Outra Cidade, UF",
+    applications: [
+      {
+        id: "app-3",
+        date: "2024-06-01",
+        product: "Inseticida Guardião",
+        dose: "500ml/ha",
+        method: "Pulverização costal",
+        responsible: "Maria Oliveira (CREA-RJ 654321)",
+        culture: "Milho",
+      },
+    ],
+  },
+];

@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +19,7 @@ import DashboardRastreabilidade from "./pages/DashboardRastreabilidade";
 import { AuthProvider } from "./contexts/AuthProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./components/AppLayout";
+import PropriedadesPage from "./pages/PropriedadesPage";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +53,7 @@ const App = () => (
               {/* Fase 3 e 4 */}
               <Route path="nfe" element={<NFePage />} />
               <Route path="rastreabilidade" element={<DashboardRastreabilidade />} />
+              <Route path="propriedades" element={<PropriedadesPage />} />
               {/* Outras rotas do dashboard podem ser adicionadas aqui */}
             </Route>
 
