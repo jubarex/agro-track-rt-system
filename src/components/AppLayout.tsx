@@ -1,3 +1,4 @@
+
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import {
   SidebarProvider,
@@ -13,7 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Home, LogOut, LayoutDashboard, Table, Users, ShieldCheck, UploadCloud, Timeline } from "lucide-react";
+import { Home, LogOut, LayoutDashboard, Table, Users, ShieldCheck, UploadCloud, Activity } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
@@ -24,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+// Troca o Timeline por Activity no menuByRole
 const menuByRole = {
   industry: [
     {
@@ -44,7 +46,7 @@ const menuByRole = {
     {
       title: "Rastreabilidade",
       to: "/dashboard/rastreabilidade",
-      icon: Timeline,
+      icon: Activity,
     },
   ],
   resale: [
@@ -66,7 +68,7 @@ const menuByRole = {
     {
       title: "Rastreabilidade",
       to: "/dashboard/rastreabilidade",
-      icon: Timeline,
+      icon: Activity,
     },
   ],
   rt: [

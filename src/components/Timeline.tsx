@@ -1,5 +1,5 @@
 
-import { Timeline as TimelineIcon, Map, Clock } from "lucide-react";
+import { Activity, Map, Clock } from "lucide-react";
 
 type Movimentacao = {
   data: string;
@@ -12,7 +12,7 @@ const Timeline = ({ movimentacoes }: { movimentacoes: Movimentacao[] }) => (
     {movimentacoes.map((mov, idx) => (
       <li key={idx} className="mb-8 ml-6">
         <span className="absolute flex items-center justify-center w-8 h-8 bg-primary rounded-full -left-4 ring-4 ring-background">
-          <TimelineIcon className="w-5 h-5 text-background" />
+          <Activity className="w-5 h-5 text-background" />
         </span>
         <div className="flex items-center gap-2 text-sm mb-1">
           <Clock className="w-4 h-4 text-muted-foreground" />
