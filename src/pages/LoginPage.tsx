@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { User } from "@/types";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Por favor, insira um email válido." }),
@@ -32,20 +33,45 @@ const LoginPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
-    // Simulação de login bem-sucedido para desenvolvimento da UI
-    setTimeout(() => {
-      setLoading(false);
-      toast({
-        title: "Login (Simulado) bem-sucedido!",
-        description: "Redirecionando para a página principal...",
-      });
-      // A role será definida dinamicamente quando o Supabase for integrado
-      login({ 
-        email: values.email,
-        fullName: 'Usuário de Teste', 
-        role: 'Produtor Rural' 
-      });
-    }, 1000);
+    // Simulação de login buscando dados do localStorage
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simula latência de rede
+
+      const usersJSON = localStorage.getItem('users_db');
+      const users: User[] = usersJSON ? JSON.parse(usersJSON) : [];
+
+      const foundUser = users.find(u => u.email === values.email);
+      // A checagem de senha é ignorada por ser uma simulação
+
+      if (foundUser) {
+        toast({
+          title: "Login bem-sucedido!",
+          description: "Redirecionando para a página principal...",
+        });
+        login({ 
+          email: foundUser.email,
+          fullName: foundUser.name, 
+          role: foundUser.role,
+          creaNumber: foundUser.creaNumber,
+          creaValidated: foundUser.creaValidated,
+        });
+      } else {
+        toast({
+          title: "Erro de Login",
+          description: "Email ou senha inválidos.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+        console.error("Failed to log in:", error);
+        toast({
+            title: "Erro de Login",
+            description: "Ocorreu um erro inesperado.",
+            variant: "destructive",
+        });
+    } finally {
+        setLoading(false);
+    }
   };
 
   return (

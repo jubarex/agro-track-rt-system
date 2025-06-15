@@ -23,6 +23,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
+import { User } from "@/types";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Nome completo deve ter pelo menos 2 caracteres." }),
@@ -62,27 +63,11 @@ const SignupPage = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
 
+    let creaValidated = false;
+
     if (values.role === 'rt') {
       console.log(`Simulando validação do CREA no backend: ${values.creaNumber}`);
       
-      // --- PONTO DE INTEGRAÇÃO COM O BACKEND ---
-      // Para uma implementação real, você chamaria sua Supabase Edge Function aqui para validar o CREA.
-      // Exemplo:
-      //
-      // const { data, error } = await supabase.functions.invoke('validate-crea', { 
-      //   body: { creaNumber: values.creaNumber } 
-      // });
-      // 
-      // if (error || !data.isValid) {
-      //   toast({ title: "CREA Inválido", description: "Não foi possível validar seu número do CREA.", variant: "destructive" });
-      //   form.setError("creaNumber", { type: "manual", message: "Número do CREA inválido." });
-      //   setLoading(false);
-      //   return;
-      // }
-      //
-      // toast({ title: "CREA Validado", description: "Seu número de CREA foi validado com sucesso!" });
-      // --- FIM DO PONTO DE INTEGRAÇÃO ---
-
       // Simulação da validação para fins de UI
       await new Promise(resolve => setTimeout(resolve, 1500));
       const isCreaValid = Math.random() > 0.2; // 80% de chance de ser válido
@@ -98,54 +83,57 @@ const SignupPage = () => {
         return;
       }
       
+      creaValidated = true;
       toast({
         title: "CREA Validado (Simulado)",
         description: "Seu número de CREA foi validado com sucesso!",
       });
     }
 
-    console.log("Signup form submitted (Supabase integration is paused):", values);
+    // Usando localStorage para simular um banco de dados de usuários
+    try {
+      const usersJSON = localStorage.getItem('users_db');
+      const users: User[] = usersJSON ? JSON.parse(usersJSON) : [];
 
-    // A chamada ao Supabase está temporariamente desabilitada.
-    // Para reativar, você adicionaria os dados do CREA ao objeto `data` do usuário
-    /*
-    const { error } = await supabase.auth.signUp({
-      email: values.email,
-      password: values.password,
-      options: {
-        data: {
-          full_name: values.fullName,
-          role: values.role,
-          ...(values.role === 'rt' && { crea_number: values.creaNumber, crea_validated: true })
-        },
-      },
-    });
-    setLoading(false);
+      const existingUser = users.find(u => u.email === values.email);
+      if (existingUser) {
+        toast({
+          title: "Erro no Cadastro",
+          description: "Este email já está cadastrado.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
 
-    if (error) {
-      toast({
-        title: "Erro no Cadastro",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Cadastro Realizado com Sucesso!",
-        description: "Enviamos um email de confirmação para você.",
-      });
-      navigate("/login");
-    }
-    */
+      const newUser: User = {
+        id: values.email,
+        name: values.fullName,
+        email: values.email,
+        role: values.role,
+        creaNumber: values.creaNumber,
+        creaValidated: values.role === 'rt' ? creaValidated : undefined,
+      };
 
-    // Simulação de cadastro bem-sucedido para desenvolvimento da UI
-    setTimeout(() => {
-      setLoading(false);
+      users.push(newUser);
+      localStorage.setItem('users_db', JSON.stringify(users));
+
       toast({
         title: "Cadastro (Simulado) bem-sucedido!",
         description: "Redirecionando para a página de login...",
       });
       navigate("/login");
-    }, 1000);
+
+    } catch (error) {
+      console.error("Failed to sign up:", error);
+      toast({
+        title: "Erro no Cadastro",
+        description: "Ocorreu um erro inesperado.",
+        variant: "destructive",
+      });
+    } finally {
+        setLoading(false);
+    }
   };
 
   return (
