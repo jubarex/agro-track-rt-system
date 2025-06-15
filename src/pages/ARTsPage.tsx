@@ -5,11 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ART, MOCK_PROPERTIES, MOCK_ARTS, FullART } from "@/types";
 import ARTSheet from "@/components/ARTSheet"; 
-import { FilePlus, Eye, Trash2, UserCheck } from "lucide-react";
+import { FilePlus, Eye, Trash2, UserCheck, Download, Wheat } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const ARTsPage = () => {
   const [arts, setArts] = useState<FullART[]>(MOCK_ARTS);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleSaveArt = (art: ART) => {
     const property = MOCK_PROPERTIES.find(p => p.id === art.propertyId);
@@ -22,8 +24,56 @@ const ARTsPage = () => {
       applicationProduct: application?.product || 'N/A',
       applicationDate: application?.date || 'N/A',
       responsible: application?.responsible || 'N/A',
+      culture: application?.culture || 'N/A',
     };
     setArts(prev => [...prev, newArt]);
+  };
+
+  const filteredArts = arts.filter(art => {
+    const search = searchTerm.toLowerCase();
+    return (
+      art.artNumber.toLowerCase().includes(search) ||
+      art.propertyName.toLowerCase().includes(search) ||
+      art.responsible.toLowerCase().includes(search) ||
+      art.applicationProduct.toLowerCase().includes(search) ||
+      art.culture.toLowerCase().includes(search)
+    );
+  });
+
+  const handleExportCSV = () => {
+    const headers = ["Nº da ART", "Propriedade", "Responsável Técnico", "Cultura", "Produto Aplicado", "Data de Emissão", "Data da Aplicação"];
+    
+    const escapeCsvCell = (cell: string | number | null | undefined) => {
+      if (cell === null || cell === undefined) {
+        return '';
+      }
+      const cellStr = String(cell);
+      if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+        return `"${cellStr.replace(/"/g, '""')}"`;
+      }
+      return cellStr;
+    };
+
+    const rows = filteredArts.map(art =>
+      [
+        art.artNumber,
+        art.propertyName,
+        art.responsible,
+        art.culture,
+        art.applicationProduct,
+        art.issueDate,
+        art.applicationDate,
+      ].map(escapeCsvCell).join(",")
+    );
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "historico_arts.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -33,10 +83,16 @@ const ARTsPage = () => {
           <h1 className="text-2xl font-bold">Gerenciamento de ARTs</h1>
           <p className="text-muted-foreground">Crie, visualize e gerencie as Anotações de Responsabilidade Técnica.</p>
         </div>
-        <Button onClick={() => setIsSheetOpen(true)}>
-            <FilePlus className="w-4 h-4 mr-2" />
-            Adicionar ART
-        </Button>
+        <div className="flex items-center gap-2">
+            <Button onClick={handleExportCSV} variant="outline" disabled={filteredArts.length === 0}>
+                <Download />
+                Exportar (CSV)
+            </Button>
+            <Button onClick={() => setIsSheetOpen(true)}>
+                <FilePlus/>
+                Adicionar ART
+            </Button>
+        </div>
       </div>
 
       <Card>
@@ -45,26 +101,40 @@ const ARTsPage = () => {
           <CardDescription>Lista de todas as ARTs vinculadas às suas atividades.</CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-4">
+            <Input
+              placeholder="Filtrar por nº ART, propriedade, responsável, produto ou cultura..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Nº da ART</TableHead>
                 <TableHead>Propriedade</TableHead>
                 <TableHead>Responsável Técnico</TableHead>
+                <TableHead>Cultura</TableHead>
                 <TableHead>Aplicação (Produto)</TableHead>
                 <TableHead>Data de Emissão</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {arts.length > 0 ? arts.map((art) => (
+              {filteredArts.length > 0 ? filteredArts.map((art) => (
                 <TableRow key={art.id}>
                   <TableCell className="font-medium">{art.artNumber}</TableCell>
                   <TableCell>{art.propertyName}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <UserCheck className="w-4 h-4 text-muted-foreground" />
+                      <UserCheck />
                       {art.responsible}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Wheat />
+                      {art.culture}
                     </div>
                   </TableCell>
                   <TableCell>{`${art.applicationProduct} em ${art.applicationDate}`}</TableCell>
@@ -84,7 +154,7 @@ const ARTsPage = () => {
                 </TableRow>
               )) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center">Nenhuma ART registrada.</TableCell>
+                  <TableCell colSpan={7} className="text-center h-24">Nenhuma ART encontrada.</TableCell>
                 </TableRow>
               )}
             </TableBody>
