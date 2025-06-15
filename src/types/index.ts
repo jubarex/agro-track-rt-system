@@ -1,4 +1,13 @@
+
 import { z } from "zod";
+
+// User type for authentication
+export type User = {
+  id: string;
+  name: string;
+  email?: string;
+  role: "industry" | "resale" | "rt" | "farmer" | "fiscal" | "admin";
+};
 
 // Adicionando o tipo NFeData para ser compartilhado
 export type NFeData = {
