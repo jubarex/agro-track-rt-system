@@ -11,6 +11,7 @@ import { Lote, FullART, MOCK_LOTES, MOCK_ARTS, MOCK_PROPERTIES, Property, Applic
 import { Search, FileText } from "lucide-react";
 import AgrochemicalUsageReport from "@/components/AgrochemicalUsageReport";
 import ActiveProfessionalsReport from "@/components/ActiveProfessionalsReport";
+import AuditTrailLog from "@/components/AuditTrailLog";
 
 const DashboardFiscal = () => {
   const [loteSearch, setLoteSearch] = useState("");
@@ -164,6 +165,9 @@ const DashboardFiscal = () => {
       {/* US013: Cruzamento de Dados */}
       <DataCrossAnalysis arts={arts} properties={properties} lotes={lotes} />
       
+      {/* Audit Trail Log */}
+      <AuditTrailLog />
+
       {/* US014: Mapa de Aplicações */}
       <Card>
          <CardHeader>

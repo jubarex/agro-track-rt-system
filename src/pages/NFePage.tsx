@@ -5,14 +5,17 @@ import { NFeData } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { UploadCloud, FileText } from "lucide-react";
+import { useAuditTrail } from "@/hooks/useAuditTrail";
 
 const NFePage = () => {
     const [nfes, setNfes] = useState<NFeData[]>([]);
+    const { logAction } = useAuditTrail();
 
     const handleAddNfe = (nfe: NFeData) => {
         // Evita adicionar duplicados pelo nome do arquivo
         if (!nfes.some(existingNfe => existingNfe.fileName === nfe.fileName)) {
             setNfes(prev => [nfe, ...prev]);
+            logAction('Carregou NF-e', { fileName: nfe.fileName, numero: nfe.numero });
         }
     };
 

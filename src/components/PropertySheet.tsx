@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import LocationPicker from "./LocationPicker";
 import { PlusCircle } from "lucide-react";
+import { useAuditTrail } from "@/hooks/useAuditTrail";
 
 type PropertySheetProps = {
   onSave: (property: Property) => void;
@@ -18,6 +19,7 @@ type PropertySheetProps = {
 const PropertySheet = ({ onSave }: PropertySheetProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
+  const { logAction } = useAuditTrail();
 
   const form = useForm<Property>({
     resolver: zodResolver(propertySchema),
@@ -33,7 +35,9 @@ const PropertySheet = ({ onSave }: PropertySheetProps) => {
   });
 
   const onSubmit = (data: Property) => {
-    onSave({ ...data, id: `prop-${Date.now()}` });
+    const newProperty = { ...data, id: `prop-${Date.now()}` };
+    onSave(newProperty);
+    logAction("Criou Propriedade", { name: newProperty.name, owner: newProperty.ownerCpfCnpj });
     toast({ title: "Sucesso!", description: "Propriedade salva com sucesso." });
     form.reset();
     setIsOpen(false);

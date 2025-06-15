@@ -32,6 +32,7 @@ import { ART, MOCK_PROPERTIES, artSchema, Application } from "@/types";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Upload } from "lucide-react";
+import { useAuditTrail } from "@/hooks/useAuditTrail";
 
 interface ARTSheetProps {
   isOpen: boolean;
@@ -43,6 +44,7 @@ const ARTSheet = ({ isOpen, onOpenChange, onSave }: ARTSheetProps) => {
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
   const [fileName, setFileName] = useState<string>("");
+  const { logAction } = useAuditTrail();
 
   const form = useForm<z.infer<typeof artSchema>>({
     resolver: zodResolver(artSchema),
@@ -75,6 +77,7 @@ const ARTSheet = ({ isOpen, onOpenChange, onSave }: ARTSheetProps) => {
 
   function onSubmit(values: z.infer<typeof artSchema>) {
     onSave(values);
+    logAction("Criou ART", { artNumber: values.artNumber, propertyId: values.propertyId });
     toast.success("ART salva com sucesso!");
     onOpenChange(false);
     form.reset();
