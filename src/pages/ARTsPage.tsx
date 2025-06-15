@@ -25,6 +25,7 @@ const ARTsPage = () => {
       applicationDate: application?.date || 'N/A',
       responsible: application?.responsible || 'N/A',
       culture: application?.culture || 'N/A',
+      dose: application?.dose || 'N/A',
     };
     setArts(prev => [...prev, newArt]);
   };

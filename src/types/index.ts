@@ -137,6 +137,7 @@ export type FullART = ART & {
   applicationDate: string;
   responsible: string;
   culture: string;
+  dose: string;
 };
 
 // Dados mock para ARTs
@@ -157,5 +158,6 @@ export const MOCK_ARTS: FullART[] = [
     applicationDate: app1?.date || 'N/A',
     responsible: app1?.responsible || 'N/A',
     culture: app1?.culture || 'N/A',
+    dose: app1?.dose || 'N/A',
   }
 ];
