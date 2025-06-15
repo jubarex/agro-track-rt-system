@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 
 // Schema para validação do formulário de propriedade
@@ -128,3 +129,32 @@ export const MOCK_PROPERTIES: (Property & { applications: Application[], car?: C
     ],
   },
 ];
+
+// Tipo para ART completa com dados denormalizados para exibição
+export type FullART = ART & {
+  propertyName: string;
+  applicationProduct: string;
+  applicationDate: string;
+  responsible: string;
+};
+
+// Dados mock para ARTs
+const prop1 = MOCK_PROPERTIES.find(p => p.id === 'prop-1');
+const app1 = prop1?.applications.find(a => a.id === 'app-1');
+
+export const MOCK_ARTS: FullART[] = [
+  {
+    id: "art-1",
+    artNumber: "2024123456",
+    issueDate: "2024-06-12",
+    propertyId: "prop-1",
+    applicationId: "app-1",
+    fileUrl: "/mock-art.pdf", // Link para o PDF
+    // Dados denormalizados
+    propertyName: prop1?.name || 'N/A',
+    applicationProduct: app1?.product || 'N/A',
+    applicationDate: app1?.date || 'N/A',
+    responsible: app1?.responsible || 'N/A',
+  }
+];
+

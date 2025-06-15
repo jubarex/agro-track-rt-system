@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Application, MOCK_PROPERTIES, Property, Car } from "@/types";
+import { Application, MOCK_PROPERTIES, Property, Car, MOCK_ARTS, FullART } from "@/types";
 import PropertySheet from "@/components/PropertySheet";
-import { Download, MapPin, Tractor, Wheat, BookCheck } from "lucide-react";
+import { Download, MapPin, Tractor, Wheat, BookCheck, FileText, UserCheck, Eye } from "lucide-react";
 import PropertyMap from "@/components/PropertyMap";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -144,6 +144,70 @@ const CarDetails = ({ car }: { car?: Car }) => {
     )
 }
 
+const ArtAndPrescriptionHistory = ({ property }: { property: FullProperty }) => {
+  const artsForProperty = MOCK_ARTS.filter(art => art.propertyId === property.id);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <FileText className="w-5 h-5 text-primary" />
+          Histórico de Receituários (ARTs)
+        </CardTitle>
+        <CardDescription>
+          Visualize todas as Anotações de Responsabilidade Técnica e receituários agronômicos gerados para esta propriedade.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nº da ART</TableHead>
+              <TableHead>Data de Emissão</TableHead>
+              <TableHead>Responsável Técnico</TableHead>
+              <TableHead>Produto Aplicado</TableHead>
+              <TableHead className="text-right">Receituário</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {artsForProperty.length > 0 ? artsForProperty.map((art) => (
+              <TableRow key={art.id}>
+                <TableCell className="font-medium">{art.artNumber}</TableCell>
+                <TableCell>{art.issueDate}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <UserCheck className="w-4 h-4 text-muted-foreground" />
+                    {art.responsible}
+                  </div>
+                </TableCell>
+                <TableCell>{art.applicationProduct}</TableCell>
+                <TableCell className="text-right">
+                  {art.fileUrl ? (
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={art.fileUrl} target="_blank" rel="noopener noreferrer">
+                        <Eye className="w-4 h-4 mr-2" />
+                        Visualizar
+                      </a>
+                    </Button>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">Não disponível</span>
+                  )}
+                </TableCell>
+              </TableRow>
+            )) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center">
+                  Nenhum receituário (ART) encontrado para esta propriedade.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+};
+
 const PropriedadesPage = () => {
   const { user } = useAuth();
   const role = user?.role?.toLowerCase();
@@ -215,6 +279,7 @@ const PropriedadesPage = () => {
               </Card>
               <CarDetails car={selectedProperty.car} />
               <ApplicationHistory applications={selectedProperty.applications} />
+              <ArtAndPrescriptionHistory property={selectedProperty} />
               <PropertyReports property={selectedProperty} />
             </>
           ) : (
