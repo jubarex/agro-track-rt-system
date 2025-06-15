@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Application, MOCK_PROPERTIES, Property } from "@/types";
 import PropertySheet from "@/components/PropertySheet";
 import { Download, MapPin, Tractor, Wheat } from "lucide-react";
+import PropertyMap from "@/components/PropertyMap";
 
 type FullProperty = Property & { applications: Application[] };
 
@@ -127,6 +128,18 @@ const PropriedadesPage = () => {
         <div className="lg:col-span-2 space-y-6">
           {selectedProperty ? (
             <>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Localização no Mapa</CardTitle>
+                  <CardDescription>Visualização da localização geográfica da propriedade.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PropertyMap 
+                    latitude={selectedProperty.latitude} 
+                    longitude={selectedProperty.longitude} 
+                  />
+                </CardContent>
+              </Card>
               <ApplicationHistory applications={selectedProperty.applications} />
               <PropertyReports property={selectedProperty} />
             </>
