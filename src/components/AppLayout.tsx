@@ -1,3 +1,4 @@
+
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import {
   SidebarProvider,
@@ -200,14 +201,14 @@ const AppLayout = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="secondary" size="icon" className="rounded-full">
                   <Avatar>
-                    <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={user?.fullName} />
-                    <AvatarFallback>{user?.fullName?.charAt(0).toUpperCase()}</AvatarFallback>
+                    <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={user?.name} />
+                    <AvatarFallback>{user?.name?.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <span className="sr-only">Toggle user menu</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>{user?.fullName}</DropdownMenuLabel>
+                <DropdownMenuLabel>{user?.name}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Perfil</DropdownMenuItem>
                 <DropdownMenuItem>Configurações</DropdownMenuItem>
