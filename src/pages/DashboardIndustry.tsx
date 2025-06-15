@@ -39,7 +39,7 @@ import Timeline from "@/components/Timeline";
 import { toast } from "sonner";
 import { PlusCircle, Eye } from "lucide-react";
 
-const formSchema = loteSchema.omit({ id: true, codigoLote: true, fabricante: true, movimentacoes: true });
+const formSchema = loteSchema.omit({ id: true, codigoLote: true, fabricante: true });
 
 const DashboardIndustry = () => {
   const [lotes, setLotes] = useState<Lote[]>(MOCK_LOTES);

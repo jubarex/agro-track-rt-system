@@ -1,20 +1,14 @@
 
 import { Activity, Map, Clock, Users } from "lucide-react";
+import { Movimentacao } from "@/types";
 
-type Movimentacao = {
-  data: string;
-  evento: string;
-  local: string;
-  tipo: "Recebimento" | "Transporte" | "Venda" | "Processamento";
-  responsavel: string;
-  observacao?: string;
-};
-
-const corPorTipo = {
+const corPorTipo: Record<Movimentacao['tipo'], string> = {
   Recebimento: "bg-green-500",
   Transporte: "bg-blue-500",
   Venda: "bg-orange-500",
-  Processamento: "bg-purple-500"
+  Processamento: "bg-purple-500",
+  Fabricação: "bg-indigo-500",
+  Aplicação: "bg-teal-500",
 };
 
 const Timeline = ({ movimentacoes }: { movimentacoes: Movimentacao[] }) => (
@@ -26,7 +20,7 @@ const Timeline = ({ movimentacoes }: { movimentacoes: Movimentacao[] }) => (
         </span>
         <div className="flex flex-wrap items-center gap-3 text-sm mb-1">
           <Clock className="w-4 h-4 text-muted-foreground" />
-          <span className="font-medium">{mov.data}</span>
+          <span className="font-medium">{new Date(mov.data).toLocaleDateString()}</span>
           <span className="inline-block bg-muted px-2 py-0.5 rounded text-xs text-muted-foreground ml-2">{mov.tipo}</span>
         </div>
         <p className="text-base font-semibold">{mov.evento}</p>
