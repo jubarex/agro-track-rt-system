@@ -1,4 +1,3 @@
-
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import {
   SidebarProvider,
@@ -24,6 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Notifications from "./Notifications";
 
 // Troca o Timeline por Activity no menuByRole
 const menuByRole = {
@@ -190,6 +190,7 @@ const AppLayout = () => {
         <main className="flex-1 flex flex-col">
           <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:h-[60px] lg:px-6">
             <div className="w-full flex-1" />
+            <Notifications />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="secondary" size="icon" className="rounded-full">

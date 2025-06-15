@@ -25,6 +25,15 @@ export type Application = {
   culture: string;
 };
 
+// Tipo para Notificações
+export type Notification = {
+  id: string;
+  message: string;
+  date: string;
+  read: boolean;
+  link?: string;
+};
+
 // Schema para validação do formulário de ART
 export const artSchema = z.object({
   id: z.string().optional(),
@@ -51,7 +60,7 @@ export const MOCK_PROPERTIES: (Property & { applications: Application[] })[] = [
     applications: [
       {
         id: "app-1",
-        date: "2024-06-10",
+        date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0], // Amanhã
         product: "Herbicida Z-MAX",
         dose: "2L/ha",
         method: "Pulverização tratorizada",
@@ -60,7 +69,7 @@ export const MOCK_PROPERTIES: (Property & { applications: Application[] })[] = [
       },
       {
         id: "app-2",
-        date: "2024-05-20",
+        date: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split('T')[0], // Em 3 dias
         product: "Fungicida Protetor",
         dose: "1.5L/ha",
         method: "Pulverização aérea",
@@ -81,7 +90,7 @@ export const MOCK_PROPERTIES: (Property & { applications: Application[] })[] = [
     applications: [
       {
         id: "app-3",
-        date: "2024-06-01",
+        date: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString().split('T')[0], // Em 5 dias
         product: "Inseticida Guardião",
         dose: "500ml/ha",
         method: "Pulverização costal",
